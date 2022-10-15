@@ -30,6 +30,14 @@ It's made to be run in a proper terminal, with color and stuff:
 ┗━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┛
 ```
 
+In green 1 entropy (so, certain) cells added last turn
+
+In yellow random choices made.
+
+Used when no 1 entropy cell have been found, make a random choice in one of the lowest entropy cells.
+
+in small and blue: available possibilities for this cell (when there less than 6)
+
 ![output example](./s.png "Output example")
 
 ## Install
@@ -39,3 +47,9 @@ Nope.
 
 ## Run
 `node index.js`
+
+## Options
+
+You can play with `config.js` to configure the printing timers.
+
+Colors are customized in `print.js` (the well named `c` const)
