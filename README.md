@@ -30,6 +30,7 @@ It's made to be run in a proper terminal, with color and stuff:
 ┗━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┛
 ```
 
+![output example](./s.png "Output example")
 
 ## Install
 
@@ -38,5 +39,3 @@ Nope.
 
 ## Run
 `node index.js`
-
-
