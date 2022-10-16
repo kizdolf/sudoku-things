@@ -48,9 +48,9 @@ function getCellChoices(grid, cell) {
   return f;
 }
 
-async function start(grid) {
-  const betterGrid = getBetterGrid(grid);
-  printGrid(betterGrid);
+async function start(grid, ws) {
+  const betterGrid = getBetterGrid(grid.grid);
+  printGrid(betterGrid, undefined,  undefined,  {name: grid.name}, ws);
   await wait(WAIT_START);
   return betterGrid;
 }
@@ -142,9 +142,9 @@ function rollback(backTrackStack) {
   return deepCopy(lastState.grid);
 }
 
-async function solveGrid(grid, cb) {
+async function solveGrid(grid, ws) {
   let loop = 0;
-  let betterGrid = await start(grid.grid);
+  let betterGrid = await start(grid, ws);
   const backTrackStack = [];
   const textPrint = {
     name: grid.name,
@@ -163,7 +163,7 @@ async function solveGrid(grid, cb) {
     textPrint.rollback = false;
     textPrint.backTrack = backTrackStack.length;
 
-    const { smallestEntropy, noChoices, fullGrid } = setEntropy(betterGrid);
+    let { smallestEntropy, noChoices, fullGrid } = setEntropy(betterGrid);
     if (noChoices) {
       textPrint.failed = true;
       textPrint.reason = "No Choices left";
@@ -181,7 +181,7 @@ async function solveGrid(grid, cb) {
       textPrint.rollback = false;
       textPrint.backTrack = backTrackStack.length;
 
-      const goodGrid = await validateGrid(betterGrid, textPrint, cb);
+      const goodGrid = await validateGrid(betterGrid, textPrint, ws);
       if (!goodGrid) {
         textPrint.failed = true;
         textPrint.reason = `Grid failed!`;
@@ -203,6 +203,7 @@ async function solveGrid(grid, cb) {
       textPrint.reason = `No evident choice, let's guess`;
       textPrint.rollback = false;
       textPrint.backTrack = backTrackStack.length;
+      let { smallestEntropy, noChoices, fullGrid } = setEntropy(betterGrid);
 
       if (smallestEntropy === 0) {
         textPrint.failed = true;
@@ -216,20 +217,20 @@ async function solveGrid(grid, cb) {
     }
 
     if (!SKIP_PRINT) {
-      printGrid(betterGrid, undefined, undefined, textPrint, cb);
+      printGrid(betterGrid, undefined, undefined, textPrint, ws);
       await wait(WAIT_TURNS);
     }
   }
 }
 
-async function all(cb) {
-  const gridsInFile = gridsFromFile("../sudoku/grids/10_5sudoku_plain.txt");
+async function all(ws) {
+  const gridsInFile = gridsFromFile("./sudoku/grids/10_5sudoku_plain.txt");
   const allgrids = gridsInFile.concat(grids50.concat(grids))
   for (const grid of allgrids) {
     console.log("\n\nNEW GRIIIIDDD\n");
-    await wait(WAIT_START);
-    const solvedGrid = await solveGrid(grid, cb);
-    await validateGrid(solvedGrid, cb);
+    // await wait(WAIT_START);
+    const solvedGrid = await solveGrid(grid, ws);
+    await validateGrid(solvedGrid, ws);
   }
 }
 

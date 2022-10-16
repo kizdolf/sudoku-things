@@ -49,7 +49,7 @@ const firstLine = (opts = {}, ok, i, j, box) => {
   return base;
 };
 
-function getCrossingLine(opts = {}, ok, i, j, box, cb) {
+function getCrossingLine(opts = {}, ok, i, j, box) {
   const baseLine = `┠─────┼─────┼─────╂─────┼─────┼─────╂─────┼─────┼─────┨`;
   const baseCrossLine = `┣━━━━━┿━━━━━┿━━━━━╋━━━━━┿━━━━━┿━━━━━╋━━━━━┿━━━━━┿━━━━━┫`;
   const baseBottomLine = `┗━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┛`;
@@ -89,7 +89,7 @@ function getCrossingLine(opts = {}, ok, i, j, box, cb) {
   return part;
 }
 
-const val = (opts = {}, ok, i, j, box, cell, cb) => {
+const val = (opts = {}, ok, i, j, box, cell, ws) => {
   const color = ok ? c.ok : c.ko;
 
   let start = i === 0 ? `┃` : ``;
@@ -119,12 +119,12 @@ const val = (opts = {}, ok, i, j, box, cell, cb) => {
   } else if (opts.box === box + 1 && (i + 1) % 3 === 0 && i !== 8) {
     s = `${start}${value}${color}${end}${c.reset}`;
   }
-  cb && cb({ text: s, i, j });
+  ws && ws({ text: s, i, j });
   return s;
 };
 
 const store = [];
-function printGrid(grid, opts = {}, ok, text, cb) {
+function printGrid(grid, opts = {}, ok, text, ws) {
   CLEAR_SCREEN && console.clear();
   if (opts.full) {
     process.stdout.write(c.ok);
@@ -141,10 +141,10 @@ function printGrid(grid, opts = {}, ok, text, cb) {
       if (!store[i]) store[i] = [];
       if (!store[i][j]) {
         store[i][j] = cellStr;
-        cb && cb(cellStr);
+        ws && ws(cellStr);
       } else if (store[i][j] !== cellStr) {
         store[i][j] = cellStr;
-        cb && cb(cellStr);
+        ws && ws(cellStr);
       }
       printableLine += val(opts, ok, i, j, l[i].box, l[i]);
       printableCrossLine += getCrossingLine(opts, ok, i, j, l[i].box);
@@ -167,7 +167,7 @@ function printGrid(grid, opts = {}, ok, text, cb) {
     backTrack Size: ${text.backTrack}
   `;
     console.log(infos);
-    cb && cb(JSON.stringify({
+    ws && ws(JSON.stringify({
       infos: true,
       text
     }));

@@ -52,8 +52,17 @@ I grabed all the weboscket code from there, I wanted to recode from scratch but 
 Nope. Only node libs are used.
 
 ## Run
-* `cd back; node index.js`
-* open the `index.html` in you browser (uri should look like `file:///home/you/code/node/sudoku_collpase_function/front/index.html`)
+* tweak `sudoku.config.js` as you wish
+* `node index.js`
+
+**if `config.WS === true` :**
+
+open the `index.html` in you browser (uri should look like `file:///home/you/code/node/sudoku_collpase_function/front/index.html`)
+
+**anyway**
+
+look at your terminal :) 
+
 
 
 ## Options

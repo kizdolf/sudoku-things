@@ -189,7 +189,7 @@
           } else if(d.infos){
             gridName.innerHTML = d.text.name
             loop.innerHTML = d.text.loop
-            backtrack.innerHTML = d.text.backTrack
+            backtrack.innerHTML = new Array(d.text.backTrack).fill('#').join('')
           }else {
             printCell(d);
           }
