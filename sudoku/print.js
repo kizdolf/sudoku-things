@@ -1,4 +1,4 @@
-const { CLEAR_SCREEN, COLORS } = require("./config");
+const { CLEAR_SCREEN, COLORS, CONSOLE } = require("./config");
 const indices = {
   1: "₁",
   2: "₂",
@@ -125,12 +125,14 @@ const val = (opts = {}, ok, i, j, box, cell, ws) => {
 
 const store = [];
 function printGrid(grid, opts = {}, ok, text, ws) {
-  CLEAR_SCREEN && console.clear();
-  if (opts.full) {
+  CLEAR_SCREEN && CONSOLE && console.clear();
+  if (opts.full && CONSOLE) {
     process.stdout.write(c.ok);
   }
-  const fl = firstLine(opts, ok, 0, 0, grid[0][0].box);
-  console.log(fl);
+  if (CONSOLE) {
+    const fl = firstLine(opts, ok, 0, 0, grid[0][0].box);
+    console.log(fl);
+  }
 
   for (let j = 0; j < grid.length; j++) {
     const l = grid[j];
@@ -146,14 +148,18 @@ function printGrid(grid, opts = {}, ok, text, ws) {
         store[i][j] = cellStr;
         ws && ws(cellStr);
       }
-      printableLine += val(opts, ok, i, j, l[i].box, l[i]);
-      printableCrossLine += getCrossingLine(opts, ok, i, j, l[i].box);
+      if (CONSOLE) {
+        printableLine += val(opts, ok, i, j, l[i].box, l[i]);
+        printableCrossLine += getCrossingLine(opts, ok, i, j, l[i].box);
+      }
     }
-    console.log(printableLine);
-    console.log(printableCrossLine);
+    if (CONSOLE) {
+      console.log(printableLine);
+      console.log(printableCrossLine);
+    }
   }
 
-  if (opts.full) {
+  if (opts.full && CONSOLE) {
     process.stdout.write(c.reset);
   }
 
@@ -166,11 +172,14 @@ function printGrid(grid, opts = {}, ok, text, ws) {
     rollback: ${text.rollback}
     backTrack Size: ${text.backTrack}
   `;
-    console.log(infos);
-    ws && ws(JSON.stringify({
-      infos: true,
-      text
-    }));
+    CONSOLE && console.log(infos);
+    ws &&
+      ws(
+        JSON.stringify({
+          infos: true,
+          text,
+        })
+      );
   }
 }
 

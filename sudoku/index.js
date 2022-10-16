@@ -206,7 +206,6 @@ async function solveGrid(grid, ws) {
       textPrint.reason = `No evident choice, let's guess`;
       textPrint.rollback = false;
       textPrint.backTrack = backTrackStack.length;
-      let { smallestEntropy, noChoices, fullGrid } = setEntropy(betterGrid);
 
       if (smallestEntropy === 0) {
         textPrint.failed = true;
@@ -232,7 +231,7 @@ async function all(ws) {
   for (const grid of allgrids) {
     const { betterGrid, gridHistory } = await solveGrid(grid, ws);
     GENERATE_HISTORY_FILE &&
-      writeFileSync(`./historyFiles/${grid.name}.json`, JSON.stringify(gridHistory, undefined, 2));
+      writeFileSync(`./historyFiles/${grid.name.replace(' ', '_')}_${new Date().getTime()}.json`, JSON.stringify(gridHistory, undefined, 2));
     await validateGrid(betterGrid, ws);
   }
 }

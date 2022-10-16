@@ -1,11 +1,12 @@
 module.exports = {
   WAIT_START: 1500,
-  WAIT_TURNS: 150,
-  WAIT_CHECKS: 100,
+  WAIT_TURNS: 50,
+  WAIT_CHECKS: 50,
   NUMBERS: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   SKIP_PRINT: false,
-  CLEAR_SCREEN: false,
+  CLEAR_SCREEN: true,
   WS: true,
+  CONSOLE: true,
   GENERATE_HISTORY_FILE: true,
   STOP_VERIFY_AT_FIRST_ERROR: true,
   COLORS: {
