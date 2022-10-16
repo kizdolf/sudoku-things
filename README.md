@@ -1,8 +1,8 @@
 # Sudoku solver
 
-The solver only know the basic rules: 1 to 9 digits per line, columns and box
+The solver only knows the basic rules: 1 to 9 digits per line, columns and box
 
-kinda use the collapsing wave function, determining the entropy of each cell
+kinda use the collapsing wave function, determining the entropy of each cell and using it to place (or try) numbers
 
 Add some backtracking when random choices needs to be made
 
@@ -40,7 +40,7 @@ in small and blue: available possibilities for this cell (when there less than 6
 
 ![output example](./doc/s.png "Output example")
 
-But it uses websockets as well! 
+### But it uses websockets as well! 
 
 One message is sent each time a cell changes value. Yeah, why not ?
 
