@@ -2,7 +2,7 @@ const { printGrid } = require("./print");
 const { wait } = require("./helpers");
 const { NUMBERS, WAIT_CHECKS, SKIP_PRINT } = require("./config");
 
-async function validateGrid(grid, text) {
+async function validateGrid(grid, text, cb) {
   for (const l of grid) {
     for (const c of l) {
       c.justAdded = false;
@@ -15,14 +15,22 @@ async function validateGrid(grid, text) {
   for (let i = 0; i < grid.length; i++) {
     let ok = true;
     const line = grid[i];
+    const values = line.map((l) => l.value)
     for (const n of NUMBERS) {
-      if (!line.map((l) => l.value).includes(n)) {
+      if (!values.includes(n)) {
         ok = false;
         fullOK = false;
       }
     }
     if (!SKIP_PRINT) {
       printGrid(grid, { line: i }, ok, text);
+      const msg = JSON.stringify({
+        validate : true,
+        ok,
+        line: i,
+        values
+      })
+      cb && cb(msg)
       await wait(WAIT_CHECKS);
     }
   }
@@ -34,14 +42,22 @@ async function validateGrid(grid, text) {
     for (let i = 0; i < grid.length; i++) {
       column.push(grid[i][j]);
     }
+    const values = column.map((l) => l.value)
     for (const n of NUMBERS) {
-      if (!column.map((l) => l.value).includes(n)) {
+      if (!values.includes(n)) {
         fullOK = false;
         ok = false;
       }
     }
     if (!SKIP_PRINT) {
       printGrid(grid, { column: j }, ok, text);
+      const msg = JSON.stringify({
+        validate : true,
+        ok,
+        column: j,
+        values
+      })
+      cb && cb(msg)
       await wait(WAIT_CHECKS);
     }
   }
@@ -55,19 +71,28 @@ async function validateGrid(grid, text) {
         if (c.box === j) box.push(c);
       }
     }
+    const values = box.map((l) => l.value)
     for (const n of NUMBERS) {
-      if (!box.map((l) => l.value).includes(n)) {
+      if (!values.includes(n)) {
         fullOK = false;
         ok = false;
       }
     }
     if (!SKIP_PRINT) {
       printGrid(grid, { box: j }, ok, text);
+      const msg = JSON.stringify({
+        validate : true,
+        ok,
+        box: j,
+        values
+      })
+      cb && cb(msg)
       await wait(WAIT_CHECKS);
     }
   }
   if (fullOK) {
     printGrid(grid, { full: true }, undefined, text);
+    cb && cb(grid, { full: true }, undefined, text)
   }
   return fullOK;
 }

@@ -142,7 +142,7 @@ function rollback(backTrackStack) {
   return deepCopy(lastState.grid);
 }
 
-async function solveGrid(grid) {
+async function solveGrid(grid, cb) {
   let loop = 0;
   let betterGrid = await start(grid.grid);
   const backTrackStack = [];
@@ -181,7 +181,7 @@ async function solveGrid(grid) {
       textPrint.rollback = false;
       textPrint.backTrack = backTrackStack.length;
 
-      const goodGrid = await validateGrid(betterGrid, textPrint);
+      const goodGrid = await validateGrid(betterGrid, textPrint, cb);
       if (!goodGrid) {
         textPrint.failed = true;
         textPrint.reason = `Grid failed!`;
@@ -216,23 +216,27 @@ async function solveGrid(grid) {
     }
 
     if (!SKIP_PRINT) {
-      printGrid(betterGrid, undefined, undefined, textPrint);
+      printGrid(betterGrid, undefined, undefined, textPrint, cb);
       await wait(WAIT_TURNS);
     }
   }
 }
 
-async function all() {
-  const gridsFromFile = gridsFromFile("./grids/10_5sudoku_plain.txt");
-  const allgrids = gridsFromFile.concat(grids50.concat(grids))
+async function all(cb) {
+  const gridsInFile = gridsFromFile("../sudoku/grids/10_5sudoku_plain.txt");
+  const allgrids = gridsInFile.concat(grids50.concat(grids))
   for (const grid of allgrids) {
     console.log("\n\nNEW GRIIIIDDD\n");
     await wait(WAIT_START);
-    const solvedGrid = await solveGrid(grid);
-    await validateGrid(solvedGrid);
+    const solvedGrid = await solveGrid(grid, cb);
+    await validateGrid(solvedGrid, cb);
   }
 }
 
-all().then(() => {
-  process.exit(0);
-});
+// all().then(() => {
+//   process.exit(0);
+// });
+
+module.exports = {
+  all
+}

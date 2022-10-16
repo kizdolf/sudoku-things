@@ -1,7 +1,7 @@
 module.exports = {
   WAIT_START: 500,
-  WAIT_TURNS: 0,
-  WAIT_CHECKS: 0,
+  WAIT_TURNS: 200,
+  WAIT_CHECKS: 90,
   NUMBERS: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   SKIP_PRINT: false,
   CLEAR_SCREEN: true,

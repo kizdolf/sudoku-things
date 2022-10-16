@@ -38,15 +38,23 @@ Used when no 1 entropy cell have been found, make a random choice in one of the 
 
 in small and blue: available possibilities for this cell (when there less than 6)
 
-![output example](./s.png "Output example")
+![output example](./doc/s.png "Output example")
+
+But it uses websockets as well! 
+
+One message is sent each time a cell changes value. Yeah, why not ?
+
+GG and thx to https://github.com/ErickWendel/websockets-with-nodejs-from-scratch
+I grabed all the weboscket code from there, I wanted to recode from scratch but that's too much foir today.
 
 ## Install
 
-Nope.
-(`fs` lib need to be somewhere in the `node` path)
+Nope. Only node libs are used.
 
 ## Run
-`node index.js`
+* `cd back; node index.js`
+* open the `index.html` in you browser (uri should look like `file:///home/you/code/node/sudoku_collpase_function/front/index.html`)
+
 
 ## Options
 

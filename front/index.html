@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Socket Clent | Erick Wendel</title>
+  </head>
+
+  <body>
+    <br />
+    <br />
+    <br />
+    <div>
+      <span><h3 id="gridName"></h3></span>
+      <p>loop : <span id="loop"></span></p>
+      <p>backtrack stack size : <span id="backtrack"></span></p>
+    </div>
+    <canvas width="1000" height="1000"> Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;. </canvas>
+    <script>
+      const canvas = document.querySelector("canvas");
+      const ctx = canvas.getContext("2d");
+      const infos = document.getElementById("infos")
+      const gridName = document.getElementById("gridName");
+      const loop = document.getElementById("loop");
+      const backtrack = document.getElementById("backtrack");
+      const printGrid = () => {
+        for (let x = 0; x <= 9; x++) {
+          ctx.beginPath();
+          if (x === 0 || x % 3 === 0) ctx.lineWidth = 10;
+          else ctx.lineWidth = 5;
+
+          ctx.moveTo(0, x * 100 + 5);
+          ctx.lineTo(910, x * 100 + 5);
+          ctx.stroke();
+        }
+
+        for (let y = 0; y <= 9; y++) {
+          ctx.beginPath();
+          if (y === 0 || y % 3 === 0) ctx.lineWidth = 10;
+          else ctx.lineWidth = 5;
+
+          ctx.moveTo(y * 100 + 5, 5);
+          ctx.lineTo(y * 100 + 5, 910);
+          ctx.stroke();
+        }
+      };
+
+      const messages = document.getElementById("messages");
+      const socket = new WebSocket("ws://localhost:1337");
+
+      const printCell = (d) => {
+        let xOffset = 50;
+        let yOffset = 60;
+
+        if (d.cell.justAdded) {
+          ctx.fillStyle = "green";
+        } else if (d.cell.justGuessed) {
+          ctx.fillStyle = "yellow";
+        } else if (d.opts.line === d.j || d.opts.column === d.i || d.opts.box === d.cell.box) {
+          ctx.fillStyle = d.ok === true ? "green" : "red";
+        } else {
+          ctx.fillStyle = "white";
+        }
+        ctx.fillRect(d.i * 100 + 5, d.j * 100 + 5, 100, 100);
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "black";
+
+        let print = "";
+        if (d.cell.value === null && d.cell.choices) {
+          print = d.cell.choices.join(" ");
+          ctx.font = "10px Arial";
+          ctx.fillStyle = "blue";
+          yOffset += 30;
+          xOffset = 10;
+        } else {
+          print = d.text;
+        }
+        ctx.fillText(print, d.i * 100 + xOffset, d.j * 100 + yOffset);
+
+        if (d.cell.madeChoices.length > 0) {
+          print = d.cell.madeChoices.join(" ");
+          ctx.font = "bolder 12px Arial";
+          ctx.fillStyle = "#e33ad4";
+          yOffset -= 30;
+          xOffset = 10;
+        }
+        ctx.fillText(print, d.i * 100 + xOffset, d.j * 100 + yOffset);
+        
+      };
+
+      let lastValidationType = "";
+      const printValidation = (d) => {
+        let xOffset = 50;
+        let yOffset = 60;
+        const validationType = d.line >= 0 ? "line" : d.column >= 0 ? "column" : "box";
+        if (validationType !== lastValidationType) {
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, 905, 905);
+          lastValidationType = validationType;
+        }
+        ctx.fillStyle = d.ok ? "green" : "red";
+
+        if (d.line >= 0) {
+          ctx.fillRect(0, d.line * 100 + 5, 905, 100);
+          ctx.font = "20px Arial";
+          ctx.fillStyle = "black";
+          for (let i = 0; i < d.values.length; i++) {
+            const v = d.values[i];
+            ctx.fillText(String(v), i * 100 + xOffset, d.line * 100 + yOffset);
+          }
+        }
+
+        if (d.column >= 0) {
+          ctx.fillRect(d.column * 100 + 5, 0, 100, 905);
+          ctx.font = "20px Arial";
+          ctx.fillStyle = "black";
+          for (let i = 0; i < d.values.length; i++) {
+            const v = d.values[i];
+            ctx.fillText(String(v), d.column * 100 + xOffset, i * 100 + yOffset);
+          }
+        }
+
+        const getBoxXY = (base) => {
+          let x, y;
+          switch (base) {
+            case 0:
+              x = 0;
+              y = 0;
+              break;
+            case 1:
+              x = 1;
+              y = 0;
+              break;
+            case 2:
+              x = 2;
+              y = 0;
+              break;
+            case 3:
+              x = 0;
+              y = 1;
+              break;
+            case 4:
+              x = 1;
+              y = 1;
+              break;
+            case 5:
+              x = 2;
+              y = 1;
+              break;
+            case 6:
+              x = 0;
+              y = 2;
+              break;
+            case 7:
+              x = 1;
+              y = 2;
+              break;
+            case 8:
+              x = 2;
+              y = 2;
+              break;
+          }
+          return { x, y };
+        };
+        if (d.box >= 0) {
+          let { x, y } = getBoxXY(d.box);
+
+          x = x * 100 * 3;
+          y = y * 100 * 3;
+          ctx.fillRect(x + 5, y + 5, 300, 300);
+          ctx.font = "20px Arial";
+          ctx.fillStyle = "black";
+          for (let i = 0; i < d.values.length; i++) {
+            const v = d.values[i];
+            let { x:xO, y:yO } = getBoxXY(i);
+
+            ctx.fillText(String(v), x + xOffset + xO * 100, y + yOffset + yO * 100);
+          }
+        }
+      };
+
+      socket.onmessage = (msg) => {
+        const message = msg.data;
+        try {
+          const d = JSON.parse(message);
+          if (d.validate) {
+            printValidation(d);
+          } else if(d.infos){
+            gridName.innerHTML = d.text.name
+            loop.innerHTML = d.text.loop
+            backtrack.innerHTML = d.text.backTrack
+          }else {
+            printCell(d);
+          }
+
+          printGrid();
+        } catch (e) {
+          console.log(e);
+          console.log(message);
+        }
+      };
+      socket.onerror = (error) => console.error(`Web Socket error`, error);
+      socket.onclose = (event) => console.log("Disconnected from WebSocket server");
+    </script>
+  </body>
+</html>

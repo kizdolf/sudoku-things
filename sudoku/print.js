@@ -49,7 +49,7 @@ const firstLine = (opts = {}, ok, i, j, box) => {
   return base;
 };
 
-function getCrossingLine(opts = {}, ok, i, j, box) {
+function getCrossingLine(opts = {}, ok, i, j, box, cb) {
   const baseLine = `┠─────┼─────┼─────╂─────┼─────┼─────╂─────┼─────┼─────┨`;
   const baseCrossLine = `┣━━━━━┿━━━━━┿━━━━━╋━━━━━┿━━━━━┿━━━━━╋━━━━━┿━━━━━┿━━━━━┫`;
   const baseBottomLine = `┗━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┛`;
@@ -57,7 +57,7 @@ function getCrossingLine(opts = {}, ok, i, j, box) {
   const color = ok ? c.ok : c.ko;
 
   let l = "";
-  // which line are we in ? 
+  // which line are we in ?
   if (j === 8) l = baseBottomLine;
   else if ((j + 1) % 3 === 0) l = baseCrossLine;
   else l = baseLine;
@@ -69,16 +69,12 @@ function getCrossingLine(opts = {}, ok, i, j, box) {
 
   if (opts.line === j + 1 || opts.line === j) {
     return `${color}${part}${c.reset}`;
-  }
-  
-  else if (opts.column === i) {
+  } else if (opts.column === i) {
     return `${color}${part}${c.reset}`;
   } else if (opts.column === i - 1) {
     const [p1, ...pr] = part.split("");
     return `${color}${p1}${c.reset}${pr.join("")}`;
-  }
-  
-  else if (opts.box === box) {
+  } else if (opts.box === box) {
     return `${color}${part}${c.reset}`;
   } else if (opts.box === box + 3 && (j + 1) % 3 === 0) {
     return `${color}${part}${c.reset}`;
@@ -93,12 +89,12 @@ function getCrossingLine(opts = {}, ok, i, j, box) {
   return part;
 }
 
-const val = (opts = {}, ok, i, j, box, cell) => {
+const val = (opts = {}, ok, i, j, box, cell, cb) => {
   const color = ok ? c.ok : c.ko;
 
   let start = i === 0 ? `┃` : ``;
   let end = (i + 1) % 3 === 0 ? `┃` : `│`;
-  
+
   let value = cell.value ? `  ${cell.value}  ` : "     ";
   if (cell.justAdded) {
     value = `${c.add}${value}${c.reset}`;
@@ -114,38 +110,44 @@ const val = (opts = {}, ok, i, j, box, cell) => {
 
   if (opts.line === j) {
     s = `${color}${start}${value}${end}${c.reset}`;
-  }
-
-  else if (opts.column === i) {
+  } else if (opts.column === i) {
     s = `${color}${start}${value}${end}${c.reset}`;
   } else if (opts.column === i + 1) {
     s = `${start}${value}${color}${end}${c.reset}`;
-  }
-  
-  else if (opts.box === box) {
+  } else if (opts.box === box) {
     s = `${color}${start}${value}${end}${c.reset}`;
   } else if (opts.box === box + 1 && (i + 1) % 3 === 0 && i !== 8) {
     s = `${start}${value}${color}${end}${c.reset}`;
   }
-
+  cb && cb({ text: s, i, j });
   return s;
 };
 
-function printGrid(grid, opts = {}, ok, text) {
+const store = [];
+function printGrid(grid, opts = {}, ok, text, cb) {
   CLEAR_SCREEN && console.clear();
-
   if (opts.full) {
     process.stdout.write(c.ok);
   }
-  console.log(firstLine(opts, ok, 0, 0, grid[0][0].box));
+  const fl = firstLine(opts, ok, 0, 0, grid[0][0].box);
+  console.log(fl);
 
   for (let j = 0; j < grid.length; j++) {
     const l = grid[j];
     let printableLine = "";
     let printableCrossLine = "";
     for (let i = 0; i < l.length; i++) {
+      const cellStr = JSON.stringify({ text: l[i].value || "   ", i, j, ok: ok || -1, opts, cell: l[i] });
+      if (!store[i]) store[i] = [];
+      if (!store[i][j]) {
+        store[i][j] = cellStr;
+        cb && cb(cellStr);
+      } else if (store[i][j] !== cellStr) {
+        store[i][j] = cellStr;
+        cb && cb(cellStr);
+      }
       printableLine += val(opts, ok, i, j, l[i].box, l[i]);
-      printableCrossLine += getCrossingLine(opts, ok, i, j, l[i].box, l[i]);
+      printableCrossLine += getCrossingLine(opts, ok, i, j, l[i].box);
     }
     console.log(printableLine);
     console.log(printableCrossLine);
@@ -155,15 +157,21 @@ function printGrid(grid, opts = {}, ok, text) {
     process.stdout.write(c.reset);
   }
 
-  if (text)
-    console.log(`
+  if (text) {
+    const infos = `
     grid: ${text.name}
     loop number: ${text.loop}
     failed: ${text.failed}
     reason: ${text.reason}
     rollback: ${text.rollback}
     backTrack Size: ${text.backTrack}
-  `);
+  `;
+    console.log(infos);
+    cb && cb(JSON.stringify({
+      infos: true,
+      text
+    }));
+  }
 }
 
 module.exports = { printGrid };
