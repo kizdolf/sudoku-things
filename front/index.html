@@ -5,6 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Web Socket Clent | Erick Wendel</title>
+    <style>
+      #id {
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        width: 1000px;
+      }
+    </style>
   </head>
 
   <body>
@@ -15,15 +25,32 @@
       <span><h3 id="gridName"></h3></span>
       <p>loop : <span id="loop"></span></p>
       <p>backtrack stack size : <span id="backtrack"></span></p>
+      <canvas id="stack" width="1000" height="100">
+        Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;.
+      </canvas>
     </div>
-    <canvas width="1000" height="1000"> Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;. </canvas>
+    <canvas id="grid" width="1000" height="1000">
+      Désolé, votre navigateur ne prend pas en charge &lt;canvas&gt;.
+    </canvas>
     <script>
-      const canvas = document.querySelector("canvas");
+      const canvas = document.getElementById("grid");
+      const stack = document.getElementById("stack");
+      const ctxStack = stack.getContext("2d");
       const ctx = canvas.getContext("2d");
-      const infos = document.getElementById("infos")
+      const infos = document.getElementById("infos");
       const gridName = document.getElementById("gridName");
       const loop = document.getElementById("loop");
       const backtrack = document.getElementById("backtrack");
+
+      const printStack = (s) => {
+        ctxStack.fillStyle = "white";
+        ctxStack.fillRect(0, 0, 1000, 100);
+        ctxStack.fillStyle = "black";
+        for (let i = 0; i < s; i++) {
+          ctxStack.fillRect(10 * i, 0, 8, 45);
+        }
+      };
+
       const printGrid = () => {
         for (let x = 0; x <= 9; x++) {
           ctx.beginPath();
@@ -86,7 +113,6 @@
           xOffset = 10;
         }
         ctx.fillText(print, d.i * 100 + xOffset, d.j * 100 + yOffset);
-        
       };
 
       let lastValidationType = "";
@@ -173,7 +199,7 @@
           ctx.fillStyle = "black";
           for (let i = 0; i < d.values.length; i++) {
             const v = d.values[i];
-            let { x:xO, y:yO } = getBoxXY(i);
+            let { x: xO, y: yO } = getBoxXY(i);
 
             ctx.fillText(String(v), x + xOffset + xO * 100, y + yOffset + yO * 100);
           }
@@ -186,11 +212,12 @@
           const d = JSON.parse(message);
           if (d.validate) {
             printValidation(d);
-          } else if(d.infos){
-            gridName.innerHTML = d.text.name
-            loop.innerHTML = d.text.loop
-            backtrack.innerHTML = new Array(d.text.backTrack).fill('#').join('')
-          }else {
+          } else if (d.infos) {
+            gridName.innerHTML = d.text.name;
+            loop.innerHTML = d.text.loop;
+            printStack(d.text.backTrack);
+            backtrack.innerHTML = d.text.backTrack;
+          } else {
             printCell(d);
           }
 
