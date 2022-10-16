@@ -45,7 +45,7 @@ But it uses websockets as well!
 One message is sent each time a cell changes value. Yeah, why not ?
 
 GG and thx to https://github.com/ErickWendel/websockets-with-nodejs-from-scratch
-I grabed all the weboscket code from there, I wanted to recode from scratch but that's too much foir today.
+I grabed all the weboscket code from there, I wanted to recode from scratch but that's too much work for today.
 
 ## Install
 
