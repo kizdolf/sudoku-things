@@ -1,18 +1,18 @@
 const grids = [
-  {
-    name: "WAYYYY tooo hard",
-    grid: [
-      [2, null, null, null, 8, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [1, null, null, null, null, 4, null, 5, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [3, null, null, null, 9, null, null, null, 8],
-    ],
-  },
+  // {
+  //   name: "WAYYYY tooo hard",
+  //   grid: [
+  //     [2, null, null, null, 8, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [1, null, null, null, null, 4, null, 5, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [3, null, null, null, 9, null, null, null, 8],
+  //   ],
+  // },
 
   {
     name: "hard",
@@ -71,20 +71,20 @@ const grids = [
       [7, null, null, null, 1, null, null, null, null],
     ],
   },
-  {
-    name: "empty",
-    grid: [
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-      [null, null, null, null, null, null, null, null, null],
-    ],
-  },
+  // {
+  //   name: "empty",
+  //   grid: [
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //     [null, null, null, null, null, null, null, null, null],
+  //   ],
+  // },
 ];
 
 module.exports = { grids };

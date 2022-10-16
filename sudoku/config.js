@@ -4,8 +4,10 @@ module.exports = {
   WAIT_CHECKS: 100,
   NUMBERS: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   SKIP_PRINT: false,
-  CLEAR_SCREEN: true,
+  CLEAR_SCREEN: false,
   WS: true,
+  GENERATE_HISTORY_FILE: true,
+  STOP_VERIFY_AT_FIRST_ERROR: true,
   COLORS: {
     Reset: "\x1b[0m",
     Bright: "\x1b[1m",

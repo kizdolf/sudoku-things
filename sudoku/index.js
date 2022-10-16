@@ -2,9 +2,10 @@ const { wait, getRandomElem, deepCopy } = require("./helpers");
 const { printGrid } = require("./print");
 const { getBetterGrid, gridsFromFile } = require("./parser");
 const { validateGrid } = require("./validation");
-const { NUMBERS, WAIT_START, WAIT_TURNS, SKIP_PRINT } = require("./config");
-const { grids } = require("./grids");
-const { grids50 } = require("./more_grids");
+const { NUMBERS, WAIT_START, WAIT_TURNS, SKIP_PRINT, GENERATE_HISTORY_FILE } = require("./config");
+const { grids } = require("./grids/grids");
+const { grids50 } = require("./grids/more_grids");
+const { writeFileSync } = require("fs");
 
 function getPossibleNumbers(present, madeChoices) {
   return NUMBERS.filter((n) => !present.includes(n) && !madeChoices.includes(n));
@@ -50,7 +51,7 @@ function getCellChoices(grid, cell) {
 
 async function start(grid, ws) {
   const betterGrid = getBetterGrid(grid.grid);
-  printGrid(betterGrid, undefined,  undefined,  {name: grid.name}, ws);
+  printGrid(betterGrid, undefined, undefined, { name: grid.name }, ws);
   await wait(WAIT_START);
   return betterGrid;
 }
@@ -144,6 +145,7 @@ function rollback(backTrackStack) {
 
 async function solveGrid(grid, ws) {
   let loop = 0;
+  const gridHistory = [];
   let betterGrid = await start(grid, ws);
   const backTrackStack = [];
   const textPrint = {
@@ -155,6 +157,7 @@ async function solveGrid(grid, ws) {
     loop,
   };
   while (true) {
+    gridHistory.push(deepCopy(betterGrid));
     loop++;
 
     textPrint.loop = loop;
@@ -192,7 +195,7 @@ async function solveGrid(grid, ws) {
         await wait(WAIT_TURNS);
         continue;
       } else {
-        return betterGrid;
+        return { betterGrid, gridHistory };
       }
     }
 
@@ -225,19 +228,15 @@ async function solveGrid(grid, ws) {
 
 async function all(ws) {
   const gridsInFile = gridsFromFile("./sudoku/grids/10_5sudoku_plain.txt");
-  const allgrids = gridsInFile.concat(grids50.concat(grids))
+  const allgrids = gridsInFile.concat(grids50.concat(grids));
   for (const grid of allgrids) {
-    console.log("\n\nNEW GRIIIIDDD\n");
-    // await wait(WAIT_START);
-    const solvedGrid = await solveGrid(grid, ws);
-    await validateGrid(solvedGrid, ws);
+    const { betterGrid, gridHistory } = await solveGrid(grid, ws);
+    GENERATE_HISTORY_FILE &&
+      writeFileSync(`./historyFiles/${grid.name}.json`, JSON.stringify(gridHistory, undefined, 2));
+    await validateGrid(betterGrid, ws);
   }
 }
 
-// all().then(() => {
-//   process.exit(0);
-// });
-
 module.exports = {
-  all
-}
+  all,
+};
