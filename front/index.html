@@ -79,8 +79,9 @@
       const printCell = (d) => {
         let xOffset = 50;
         let yOffset = 60;
-
-        if (d.cell.justAdded) {
+        if (d.cell.fixedVal === true) {
+          ctx.fillStyle = "gray";
+        } else if (d.cell.justAdded) {
           ctx.fillStyle = "green";
         } else if (d.cell.justGuessed) {
           ctx.fillStyle = "yellow";

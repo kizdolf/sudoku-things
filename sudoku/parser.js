@@ -27,6 +27,7 @@ function getBetterGrid(grid) {
       const cell = line[j];
       betterLine.push({
         value: cell,
+        fixedVal: Boolean(cell > 0), 
         line: i,
         column: j,
         box: getBox(i, j),
